@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title_content %}
+  <title>Add Transaction</title>
+{% endblock %}
+
+{% block page_content %}
+  <form action="/add_transaction" method="post">
+    {% csrf_token %}
+    <label for="staffName">Staff Name:</label>
+    <input type="text" id="staffName" name="staffName" required>
+    <br>
+    <label for="custName">Customer Name:</label>
+    <input type="text" id="custName" name="custName" required>
+    <br>
+    <label for="custPhone">Customer Phone:</label>
+    <input type="text" id="custPhone" name="custPhone" required>
+    <br>
+    <label for="item">Item:</label>
+    <input type="text" id="item" name="item" required>
+    <br>
+    <label for="method">Method:</label>
+    <input type="text" id="method" name="method" required>
+    <br>
+    <label for="value">Value:</label>
+    <input type="text" id="value" name="value" required>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

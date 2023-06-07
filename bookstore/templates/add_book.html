@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title_content %}
+  <title>Add Transaction</title>
+{% endblock %}
+
+{% block page_content %}
+  <form action="/add_transaction" method="post">
+    {% csrf_token %}
+    <label for="title">Book Title:</label>
+    <input type="text" id="title" name="title" required>
+    <br>
+    <label for="descriptions">Descriptions:</label>
+    <input type="text" id="descriptions" name="descriptions" required>
+    <br>
+    <label for="yearPublished">Year Published:</label>
+    <input type="text" id="yearPublished" name="yearPublished" required>
+    <br>
+    <label for="publisher">Book Publisher:</label>
+    <input type="text" id="publisher" name="publisher" required>
+    <br>
+    <label for="writer">Book Writer:</label>
+    <input type="text" id="writer" name="writer" required>
+    <br>
+    <label for="Edition">Edition:</label>
+    <input type="text" id="Edition" name="Edition" required>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}
