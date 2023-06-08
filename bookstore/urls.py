@@ -16,6 +16,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from bookstore_api.views import *
+
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
+    path('add_writer/', addWriter, name='add_writer'),
+    path('add_writer', addWriter, name='add_writer_post'),
+    path('add_book/', addBook, name='add_book'),
+    path('add_book', addBook, name='add_book_post'),
+    path('add_publisher/', addPublisher, name='add_publisher'),
+    path('add_publisher', addPublisher, name='add_publisher_post'),
+    path('add_transaction/', addTransaction, name='add_transaction'),
+    path('add_transaction', addTransaction, name='add_transaction_post'),
+
+    path('all_writer/', all_writer, name='all_writer'),
+    path('all_publisher/', all_publisher, name='all_publisher'),
 ]

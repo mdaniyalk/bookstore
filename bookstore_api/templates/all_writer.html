@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Writer</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>All Writer Data</h1>
+
+  <table>
+    <tr>
+      <th>Writer Id</th>
+      <th>Writer Name</th>
+      <!-- Add more table headers for additional fields -->
+    </tr>
+    {% for w in writer %}
+    <tr>
+      <td>{{ w.writerId }}</td>
+      <td>{{ w.writerName }}</td>
+      <!-- Add more table cells for additional fields -->
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

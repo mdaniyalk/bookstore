@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Publisher</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .form-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>All Publisher Data</h1>
+
+  <table>
+    <tr>
+      <th>Publisher Id</th>
+      <th>Publisher Name</th>
+      <th>Publisher Location</th>
+      <!-- Add more table headers for additional fields -->
+      <th>Actions</th>
+    </tr>
+    {% for p in publisher %}
+    <tr>
+      <td>{{ p.publisherId }}</td>
+      <td>{{ p.publisherName }}</td>
+      <td>{{ p.publisherLocation }}</td>
+      <!-- Add more table cells for additional fields -->
+      <td>
+        <form class="form-container" action="{% url 'delete_publisher' p.publisherId %}" method="post" style="display: inline;">
+          {% csrf_token %}
+          <input type="hidden" name="_method" value="DELETE">
+          <button type="submit">Delete</button>
+        </form>
+        <form class="form-container" action="{% url 'edit_publisher' p.publisherId %}" method="get" style="display: inline;">
+          <button type="submit">Edit</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Add New Publisher</h2>
+  <form class="form-container" action="{% url 'add_publisher' %}" method="post">
+    {% csrf_token %}
+    <label for="publisher_name">Publisher Name:</label>
+    <input type="text" id="publisher_name" name="publisher_name" required>
+    <br>
+    <label for="publisher_location">Publisher Location:</label>
+    <input type="text" id="publisher_location" name="publisher_location" required>
+    <br>
+    <!-- Add more input fields for additional data -->
+    <button type="submit">Add Publisher</button>
+  </form>
+</body>
+</html>

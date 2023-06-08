@@ -1,0 +1,20 @@
+
+{% extends 'base.html' %}
+
+{% block title_content %}
+  <title>Add Publisher</title>
+{% endblock %}
+
+{% block page_content %}
+  <form action="/add_publisher" method="post">
+    {% csrf_token %}
+    <label for="publisherName">Publisher Name:</label>
+    <input type="text" id="publisherName" name="publisherName" required>
+    <br>
+    <label for="publisherLocation">Publisher Location:</label>
+    <input type="text" id="publisherLocation" name="publisherLocation" required>
+    <br>
+    
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

@@ -1,0 +1,17 @@
+
+{% extends 'base.html' %}
+
+{% block title_content %}
+  <title>Add Writer</title>
+{% endblock %}
+
+{% block page_content %}
+  <form action="/add_writer" method="post">
+    {% csrf_token %}
+    <label for="writerName">Writer Name:</label>
+    <input type="text" id="writerName" name="writerName" required>
+    <br>
+    
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

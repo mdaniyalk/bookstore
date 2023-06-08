@@ -1,7 +1,17 @@
 from django.shortcuts import render
 from bookstore_api.models import *
+from django.urls import reverse
 
 import datetime
+
+def home_view(request):
+    tmp_context = {
+        'urls': ['add_book', 'add_publisher', 'add_transaction', 'add_writer', 'all_writer', 'all_publisher'],
+        'data': ['Add New Book', 'Add New Publisher', 'Add New Transaction', 'Add New Writer', 'View All Writer', 'View All Publisher'], 
+        
+    }
+    context = {'data' : [{'url': tmp_context['urls'][i], 'data': tmp_context['data'][i]} for i in range(len(tmp_context['data']))]  }
+    return render(request, 'home.html', context)
 
 
 def staff_detail(request, staffId):
@@ -137,6 +147,24 @@ def get_inventory_id(storeId, bookId):
     except Inventory.DoesNotExist:
         return None
 
+def get_publisher_id(name):
+    try:
+        publisher = Publisher.objects.get(publisherName=name)
+        return publisher.publisherId
+    except publisher.DoesNotExist:
+        return None 
+    
+def get_writer_id(name):
+    try:
+        writer = Writer.objects.get(writerName=name)
+        return writer.writerId
+    except writer.DoesNotExist:
+        return None     
+
+def get_datetime_from_year(year):
+    datetime_value = datetime.datetime(int(year), 1, 1)
+    return datetime_value
+
 
 def addTransaction(request):
     if request.method == 'POST':
@@ -166,5 +194,73 @@ def addTransaction(request):
                                    customerId = customerId,
                                    inventoryId = inventoryId
                                    )
-        return render(request, 'success.html')
+        return home_view(request)
     return render(request, 'add_transaction.html')
+
+def addBook(request):
+    if request.method == 'POST':
+        title = request.POST['title']
+        descriptions = request.POST['descriptions']
+        yearPublished = request.POST['yearPublished']
+        yearPublished = get_datetime_from_year(yearPublished)
+        publisher = request.POST['publisher']
+        publisherId = get_publisher_id(publisher)
+        publisherId = Publisher.objects.get(pk=publisherId)
+        writer = request.POST['writer']
+        writerId = get_writer_id(writer)
+        writerId = Writer.objects.get(pk=writerId)
+        edition = int(request.POST['edition'])
+        
+        Book.objects.create(title=title, 
+                            descriptions=descriptions, 
+                            yearPublished = yearPublished,
+                            publisherId = publisherId,
+                            writerId = writerId,
+                            bookEdition = edition
+                            )
+        return home_view(request)
+    return render(request, 'add_book.html')
+
+def addPublisher(request):
+    if request.method == 'POST':
+        publisherName = request.POST['publisherName']
+        publisherLocation = request.POST['publisherLocation']
+        
+        Publisher.objects.create(publisherName = publisherName,
+                                 publisherLocation = publisherLocation)
+        return home_view(request)
+    return render(request, 'add_publisher.html')
+
+def addWriter(request):
+    if request.method == 'POST':
+        writerName = request.POST['writerName']
+        writer = Writer(writerName=writerName)
+        writer.save(force_insert=True)
+        return home_view(request)
+    return render(request, 'add_writer.html')
+
+
+
+def all_writer(request):
+
+    writer_obj = Writer.objects.filter()
+
+    context = {
+
+        "writer": writer_obj,
+
+    }
+
+    return render(request, "all_writer.html", context)
+
+def all_publisher(request):
+
+    publisher_obj = Publisher.objects.filter()
+
+    context = {
+
+        "publisher": publisher_obj,
+
+    }
+
+    return render(request, "all_publisher.html", context)

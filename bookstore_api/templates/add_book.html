@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title_content %}
-  <title>Add Transaction</title>
+  <title>Add Book</title>
 {% endblock %}
 
 {% block page_content %}
-  <form action="/add_transaction" method="post">
+  <form action="/add_book" method="post">
     {% csrf_token %}
     <label for="title">Book Title:</label>
     <input type="text" id="title" name="title" required>
@@ -22,8 +22,8 @@
     <label for="writer">Book Writer:</label>
     <input type="text" id="writer" name="writer" required>
     <br>
-    <label for="Edition">Edition:</label>
-    <input type="text" id="Edition" name="Edition" required>
+    <label for="edition">Edition:</label>
+    <input type="text" id="edition" name="edition" required>
     <br>
     <input type="submit" value="Submit">
   </form>
