@@ -39,6 +39,9 @@ def key_to_db_obj():
             'staff': Staff,
             'store': Store,
             'inventory': Inventory,
+            'address': Address,
+            'payment': Payment,
+            
             }
     return data
 
