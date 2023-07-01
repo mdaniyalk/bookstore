@@ -1,266 +1,197 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from bookstore_api.models import *
 from django.urls import reverse
+from django.db import transaction
+
 
 import datetime
+import re
+
+from .views_add import addEdit_views_wrapper
+
+
+
+def convert_field_name(field_name):
+    words = re.findall('[A-Z][a-z0-9]*|[a-z]+', field_name)
+    converted_name = ' '.join(words)
+
+    words = converted_name.split()
+    for i in range(len(words)):
+        words[i] = words[i].capitalize()
+    converted_name = ' '.join(words)
+    return converted_name
+
 
 def home_view(request):
     tmp_context = {
-        'urls': ['add_book', 'add_publisher', 'add_transaction', 'add_writer', 'all_writer', 'all_publisher'],
-        'data': ['Add New Book', 'Add New Publisher', 'Add New Transaction', 'Add New Writer', 'View All Writer', 'View All Publisher'], 
+        'urls': ['book', 'publisher', 'transaction', 'writer', 'address', 'customer', 'inventory', 'payment', 'staff', 'store'],
         
     }
-    context = {'data' : [{'url': tmp_context['urls'][i], 'data': tmp_context['data'][i]} for i in range(len(tmp_context['data']))]  }
+    context = {'data' : [{'url': f'{tmp_context["urls"][i]}', 'data': convert_field_name(tmp_context['urls'][i])} for i in range(len(tmp_context['urls']))]  }
     return render(request, 'home.html', context)
 
+def key_to_db_obj():
+    data = {'publisher': Publisher,
+            'book': Book,
+            'transaction': Transaction,
+            'writer': Writer,
+            'customer': Customer,
+            'staff': Staff,
+            'store': Store,
+            'inventory': Inventory,
+            }
+    return data
 
-def staff_detail(request, staffId):
 
-    staff_obj = Staff.objects.get(staffId=staffId)
-    address_obj = Address.objects.get(address_id = staff_obj.addressId)
+def view_data(request, token):
+    data = key_to_db_obj()
+
+    obj = data[token].objects.select_related().all()
+
+    field_names = [str(field.name) for field in data[token]._meta.get_fields()]
+
+    related_field_names = []
+
+    for field in data[token]._meta.get_fields():
+        if field.is_relation and field.name != 'id':
+            related_field_names.append(field.name)
+    named_field_names = [convert_field_name(name) for name in field_names[1:]]
+    combined_field_name = zip(field_names[1:], named_field_names)
     context = {
-
-        "staff": staff_obj,
-        "address": address_obj,
-
-    }
-
-    return render(request, "staff_detail.html", context)
-
-
-
-def customer_detail(request, customerId):
-
-    customer_obj = Customer.objects.get(customerId=customerId)
-    address_obj = Address.objects.get(address_id = customer_obj.addressId)
-
-    context = {
-
-        "customer": customer_obj,
-        "address": address_obj,
-
-    }
-
-    return render(request, "customer_detail.html", context)
-
-def publisher_detail(request, publisherId):
-
-    publisher_obj = Publisher.objects.get(publisherId=publisherId)
-
-    context = {
-
-        "publisher": publisher_obj,
-
-    }
-
-    return render(request, "publisher_detail.html", context)
-
-def writer_detail(request, writerId):
-
-    writer_obj = Writer.objects.get(writerId=writerId)
-
-    context = {
-
-        "writer": writer_obj,
-
-    }
-
-    return render(request, "writer_detail.html", context)
-
-def book_detail(request, bookId):
-
-    book_obj = Book.objects.get(bookId=bookId)
-    writer_obj = Writer.objects.get(writerId=book_obj.writerId)
-    publisher_obj = Publisher.objects.get(publisherId=book_obj.publisherId)
-
-    context = {
-
-        "book": book_obj,
-        "writer": writer_obj,
-        "publisher": publisher_obj,
-
-    }
-
-    return render(request, "book_detail.html", context)
-
-def store_detail(request, storeId):
-
-    store_obj = Store.objects.get(storeId=storeId)
-    staff_obj = Staff.objects.get(staffId=store_obj.staffId)
-    address_obj = Address.objects.get(address_id = store_obj.addressId)
-
-    context = {
-
-        "store": store_obj,
-        "staff": staff_obj,
-        "address": address_obj,
-
-    }
-
-    return render(request, "store_detail.html", context)
-
-def transaction_detail(request, transactionId):
-
-    transaction_obj = Transaction.objects.get(transactionId=transactionId)
-    payment_obj = Payment.objects.get(paymentId=transaction_obj.paymentId)
-    customer_obj = Customer.objects.get(customerId=transaction_obj.customerId)
-    inventory_obj = Inventory.objects.get(inventoryId=transaction_obj.inventoryId)
-
-    context = {
-
-        "transaction": transaction_obj,
-        "payment": payment_obj,
-        "customer": customer_obj,
-        "inventory": inventory_obj,
-
-    }
-
-    return render(request, "transaction_detail.html", context)
-
-def get_cust_id(name, phone):
-    try:
-        user = Customer.objects.get(name=name, 
-                                    bookId=phone)
-        return user.customerId
-    except Customer.DoesNotExist:
-        return None
-
-def get_book_id(title):
-    try:
-        book = Book.objects.get(title=title)
-        return book.bookId
-    except Book.DoesNotExist:
-        return None    
-
-def get_staff_id(name):
-    try:
-        staff = Staff.objects.get(name=name)
-        return staff.staffId
-    except staff.DoesNotExist:
-        return None   
-
-def get_inventory_id(storeId, bookId):
-    try:
-        inventory = Inventory.objects.get(storeId=storeId, 
-                                          bookId=bookId)
-        return inventory.inventoryId
-    except Inventory.DoesNotExist:
-        return None
-
-def get_publisher_id(name):
-    try:
-        publisher = Publisher.objects.get(publisherName=name)
-        return publisher.publisherId
-    except publisher.DoesNotExist:
-        return None 
-    
-def get_writer_id(name):
-    try:
-        writer = Writer.objects.get(writerName=name)
-        return writer.writerId
-    except writer.DoesNotExist:
-        return None     
-
-def get_datetime_from_year(year):
-    datetime_value = datetime.datetime(int(year), 1, 1)
-    return datetime_value
-
-
-def addTransaction(request):
-    if request.method == 'POST':
-        custName = request.POST['custName']
-        custPhone = request.POST['custPhone']
-        customerId = get_cust_id(custName, custPhone)
-        item = request.POST['item']
-        bookId = get_book_id(item)
-        method = request.POST['method']
-        value = float(request.POST['value'])
-        time = datetime.datetime.now()
-        storeId = request.POST['StoreId']
-        staffName = request.POST['staffName']
-        staffId = get_staff_id(staffName)
-
-        inventoryId = get_inventory_id(storeId, bookId)
-
-        Payment.objects.create(method=method, 
-                               value=value, 
-                               staffId=staffId)
-        payment = Payment.objects.get(method=method, 
-                                      value=value, 
-                                      staffId=staffId)
+        'name': [token, convert_field_name(token)],
+        'field_names': combined_field_name,
+        'data': [],
+        'id': [],
         
-        Transaction.objects.create(time=time, 
-                                   paymentId=payment.paymentId, 
-                                   customerId = customerId,
-                                   inventoryId = inventoryId
-                                   )
-        return home_view(request)
-    return render(request, 'add_transaction.html')
-
-def addBook(request):
-    if request.method == 'POST':
-        title = request.POST['title']
-        descriptions = request.POST['descriptions']
-        yearPublished = request.POST['yearPublished']
-        yearPublished = get_datetime_from_year(yearPublished)
-        publisher = request.POST['publisher']
-        publisherId = get_publisher_id(publisher)
-        publisherId = Publisher.objects.get(pk=publisherId)
-        writer = request.POST['writer']
-        writerId = get_writer_id(writer)
-        writerId = Writer.objects.get(pk=writerId)
-        edition = int(request.POST['edition'])
-        
-        Book.objects.create(title=title, 
-                            descriptions=descriptions, 
-                            yearPublished = yearPublished,
-                            publisherId = publisherId,
-                            writerId = writerId,
-                            bookEdition = edition
-                            )
-        return home_view(request)
-    return render(request, 'add_book.html')
-
-def addPublisher(request):
-    if request.method == 'POST':
-        publisherName = request.POST['publisherName']
-        publisherLocation = request.POST['publisherLocation']
-        
-        Publisher.objects.create(publisherName = publisherName,
-                                 publisherLocation = publisherLocation)
-        return home_view(request)
-    return render(request, 'add_publisher.html')
-
-def addWriter(request):
-    if request.method == 'POST':
-        writerName = request.POST['writerName']
-        writer = Writer(writerName=writerName)
-        writer.save(force_insert=True)
-        return home_view(request)
-    return render(request, 'add_writer.html')
-
-
-
-def all_writer(request):
-
-    writer_obj = Writer.objects.filter()
-
-    context = {
-
-        "writer": writer_obj,
-
     }
 
-    return render(request, "all_writer.html", context)
+    for data_obj in obj:
+        row = []
+        for field in field_names[1:]:
+            if field in related_field_names:
+                related_data = getattr(data_obj, field)
+                if related_data:
+                    related_value = getattr(related_data, field)
+                    row.append(str(related_value))
+                else:
+                    row.append('N/A')
+            else:
+                value = getattr(data_obj, field)
+                row.append(str(value))
+        context['data'].append(row)
+        context['id'].append(row[0])
 
-def all_publisher(request):
+    return render(request, "view_data.html", context)
 
-    publisher_obj = Publisher.objects.filter()
 
-    context = {
+@transaction.atomic
+def delete_confirm(request, token, id):
+    print(f'id: {id}')
+    data = key_to_db_obj()
+    if request.method == 'POST':
+        obj = data[token].objects.get(pk=int(id))
+        obj.delete()
+        return redirect(f'/view_data/{token}')  # Redirect to the list of all data
+    else:
+        obj = data[token].objects.get(pk=int(id))
+        context = {'obj_name': token,
+                   'name': convert_field_name(token),
+                   'obj': obj,
+                   'id': id}
+        return render(request, 'delete_confirm.html', context['obj'])
 
-        "publisher": publisher_obj,
 
-    }
+# @transaction.atomic
+# def edit_confirm(request, token, id):
+#     data = key_to_db_obj()
+#     if request.method == 'POST':
+#         obj = data[token].objects.get(pk=id)
+#         for field in data[token]._meta.get_fields():
+#             field_name = field.name
+#             if field_name in request.POST:
+#                 setattr(obj, field_name, request.POST[field_name])
+#         # Update other fields if needed
+#         obj.save()
+#         return redirect(f'view_data/{token}')   # Redirect to the list of all data
+#     else:
+#         obj = data[token].objects.get(pk=id)
+#         field_names = [str(field.name) for field in data[token]._meta.get_fields()]
+#         named_field_names = [convert_field_name(name) for name in field_names[1:]]
+#         objs = []
+#         combined_field_name = zip(field_names[1:], named_field_names, objs)
+#         context = {'obj_name': token,
+#                    'name': convert_field_name(token),
+#                    'obj': obj,
+#                    'id': id,
+#                    'field_names': combined_field_name}
+#         return render(request, 'edit_confirm.html', context)
 
-    return render(request, "all_publisher.html", context)
+
+@transaction.atomic
+def edit_confirm(request, token, id):
+    if request.method == 'POST':
+        id = int(id)
+        response = addEdit_views_wrapper(token, request, type='edit', id=id)
+        if response:
+            return redirect(f'/view_data/{token}')
+    else:
+        return render(request, f'add_{token}.html', {'type_name': 'Edit', 'type': 'edit', 'id': str(id), 'urls': f'edit_data/{token}/{id}'})
+
+def addData(request, token):
+    if request.method == 'POST':
+        response = addEdit_views_wrapper(token, request, type='add')
+        if response:
+            return redirect(f'/view_data/{token}')
+    else:
+        return render(request, f'add_{token}.html', {'type_name': 'Add', 'type': 'add', 'id':'add', 'urls': f'add_data/{token}'})
+
+
+
+# def all_writer(request):
+
+#     writer_obj = Writer.objects.filter()
+
+#     context = {
+
+#         "writer": writer_obj,
+
+#     }
+
+#     return render(request, "all_writer.html", context)
+
+# def all_publisher(request):
+
+#     publisher_obj = Publisher.objects.filter()
+
+#     context = {
+
+#         "publisher": publisher_obj,
+
+#     }
+
+#     return render(request, "all_publisher.html", context)
+
+
+
+
+# def delete_publisher_confirm(request, publisher_id):
+#     if request.method == 'POST':
+#         publisher = Publisher.objects.get(pk=publisher_id)
+#         publisher.delete()
+#         return redirect('all_publisher')  # Redirect to the list of all publishers
+#     else:
+#         publisher = Publisher.objects.get(pk=publisher_id)
+#         return render(request, 'delete_publisher.html', {'publisher': publisher})
+
+
+# def edit_publisher_confirm(request, publisher_id):
+#     if request.method == 'POST':
+#         publisher = Publisher.objects.get(pk=publisher_id)
+#         publisher.publisherName = request.POST['publisher_name']
+#         publisher.publisherLocation = request.POST['publisher_location']
+#         # Update other fields if needed
+#         publisher.save()
+#         return redirect('all_publisher')  # Redirect to the list of all publishers
+#     else:
+#         publisher = Publisher.objects.get(pk=publisher_id)
+#         return render(request, 'edit_publisher.html', {'publisher': publisher})

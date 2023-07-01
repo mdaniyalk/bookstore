@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title_content %}
-  <title>Add Book</title>
+  <title>{{ type_name }} Book</title>
 {% endblock %}
 
 {% block page_content %}
-  <form action="/add_book" method="post">
+<h1>{{ type_name }} Book</h1>
+  <form action="/{{ urls }}" method="post">
     {% csrf_token %}
     <label for="title">Book Title:</label>
     <input type="text" id="title" name="title" required>

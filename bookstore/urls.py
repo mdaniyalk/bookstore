@@ -17,19 +17,35 @@ from django.contrib import admin
 from django.urls import path
 
 from bookstore_api.views import *
+from bookstore_api.views_add import *
 
 urlpatterns = [
     path('', home_view, name='home'),
     path('admin/', admin.site.urls),
-    path('add_writer/', addWriter, name='add_writer'),
-    path('add_writer', addWriter, name='add_writer_post'),
-    path('add_book/', addBook, name='add_book'),
-    path('add_book', addBook, name='add_book_post'),
-    path('add_publisher/', addPublisher, name='add_publisher'),
-    path('add_publisher', addPublisher, name='add_publisher_post'),
-    path('add_transaction/', addTransaction, name='add_transaction'),
-    path('add_transaction', addTransaction, name='add_transaction_post'),
+    path('writer/<str:type>/', addEditWriter, name='writer'),
+    path('writer/<str:type>', addEditWriter, name='writer_post'),
+    path('book/<str:type>/', addEditBook, name='book'),
+    path('book/<str:type>', addEditBook, name='book_post'),
+    path('publisher/<str:type>/', addEditPublisher, name='publisher'),
+    path('publisher/<str:type>', addEditPublisher, name='publisher_post'),
+    path('transaction/<str:type>/', addEditTransaction, name='transaction'),
+    path('transaction/<str:type>', addEditTransaction, name='transaction_post'),
 
-    path('all_writer/', all_writer, name='all_writer'),
-    path('all_publisher/', all_publisher, name='all_publisher'),
+    # path('delete_publisher_confirm/<int:publisher_id>/', delete_publisher_confirm, name='delete_publisher_confirm'),
+    # path('edit_publisher_confirm/<int:publisher_id>/', edit_publisher_confirm, name='edit_publisher_confirm'),
+
+    # path('all_writer/', all_writer, name='all_writer'),
+    # path('all_publisher/', all_publisher, name='all_publisher'),
+    path('view_data/<str:token>', view_data, name='view_data'),
+    path('view_data/<str:token>/', view_data, name='view_data'),
+    path('edit_data/<str:token>/', edit_confirm, name='edit_data'),
+    path('edit_data/<str:token>', edit_confirm, name='edit_data'),
+    path('edit_data/<str:token>/<int:id>', edit_confirm, name='edit_data'),
+    path('edit_data/<str:token>/<int:id>/', edit_confirm, name='edit_data'),
+    path('delete_confirm/<str:token>/<int:id>', delete_confirm, name='delete_confirm'),
+    path('delete_confirm/<str:token>/<int:id>/', delete_confirm, name='delete_confirm'),
+    path('add_data/<str:token>', addData, name='add_data'),
+    path('add_data/<str:token>/', addData, name='add_data'),
+
+
 ]

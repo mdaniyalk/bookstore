@@ -1,12 +1,12 @@
-
 {% extends 'base.html' %}
 
 {% block title_content %}
-  <title>Add Writer</title>
+  <title>{{ type_name }} Writer</title>
 {% endblock %}
 
 {% block page_content %}
-  <form action="/add_writer" method="post">
+<h1>{{ type_name }} Writer</h1>
+  <form action="/{{ urls }}" method="post">
     {% csrf_token %}
     <label for="writerName">Writer Name:</label>
     <input type="text" id="writerName" name="writerName" required>

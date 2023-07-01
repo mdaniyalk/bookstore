@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit {{ name }}</title>
+</head>
+<body>
+  <h1>Edit {{ name }}</h1>
+
+  <form action="{% url 'edit_confirm' obj_name id %}" method="post">
+    {% csrf_token %}
+    {% for name, fname, obj_f in field_names %}
+    <label for="name">{{ fname }}:</label>
+    <input type="text" id="name" name="name"  required>
+    <br>
+    {% endfor %}
+    <!-- Add more input fields for additional data -->
+    <button type="submit">Update Publisher</button>
+    <a href="{% url 'view_data' obj_name %}">Cancel</a>
+  </form>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title_content %}
+  <title>{{ type_name }} Store</title>
+{% endblock %}
+
+{% block page_content %}
+<h1>{{ type_name }} Store</h1>
+  <form action="/{{ urls }}" method="post">
+    {% csrf_token %}
+    <label for="staffId">Staff ID:</label>
+    <input type="number" id="staffId" name="staffId" required>
+    <br>
+    <label for="addressId">Address ID:</label>
+    <input type="number" id="addressId" name="addressId" required>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

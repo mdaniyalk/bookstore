@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All {{ name.1 }}</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .form-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>All {{ name.1 }} Data</h1>
+
+  <table>
+    <tr>
+      {% for a, fname in field_names %}
+        <th>{{ fname }}</th>
+      {% endfor %}
+      <!-- Add more table headers for additional fields -->
+      <th>Actions</th>
+    </tr>
+    {% for p in data %}
+    <tr>
+      {% for q in p %}
+        <td>{{ q }}</td>
+      {% endfor %}
+      <td>
+        <form class="form-container" action="{% url 'delete_confirm' token=name.0 id=p.0 %}" method="post" style="display: inline;">
+          {% csrf_token %}
+          <input type="hidden" name="_method" value="DELETE">
+          <button type="submit">Delete</button>
+        </form>
+        <form class="form-container" action="{% url 'edit_data' token=name.0 id=p.0 %}" method="get" style="display: inline;">
+          <button type="submit">Edit</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Add New {{ name.1 }}</h2>
+  <form class="form-container" action="{% url 'add_data' token=name.0 %}" method="get" style="display: inline;">
+    <button type="submit">Add {{ name.1 }}</button>
+  </form>
+  <form class="form-container" action="{% url 'home' %}" method="get" style="display: inline;">
+    <button type="submit">Back to Homepage</button>
+  </form>
+
+</body>
+</html>

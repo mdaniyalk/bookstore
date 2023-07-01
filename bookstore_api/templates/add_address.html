@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title_content %}
+  <title>{{ type_name }} Address</title>
+{% endblock %}
+
+{% block page_content %}
+<h1>{{ type_name }} Address</h1>
+  <form action="/{{ urls }}" method="post">
+    {% csrf_token %}
+    <label for="streetName">Street Name:</label>
+    <input type="text" id="streetName" name="streetName" required>
+    <br>
+    <label for="buildingNum">Building Number:</label>
+    <input type="number" id="buildingNum" name="buildingNum" required>
+    <br>
+    <label for="regency">Regency:</label>
+    <input type="text" id="regency" name="regency" required>
+    <br>
+    <label for="state">State:</label>
+    <input type="text" id="state" name="state" required>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

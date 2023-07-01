@@ -2,11 +2,13 @@
 {% extends 'base.html' %}
 
 {% block title_content %}
-  <title>Add Publisher</title>
+  <title>{{ type_name }} Publisher</title>
 {% endblock %}
 
 {% block page_content %}
-  <form action="/add_publisher" method="post">
+<h1>{{ type_name }} Publisher</h1>
+  <form action="/{{ urls }}" method="post">
+    
     {% csrf_token %}
     <label for="publisherName">Publisher Name:</label>
     <input type="text" id="publisherName" name="publisherName" required>
