@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-yxlwvh2sg$4fjtg7dws9wrz296v(!%9t(1eg(v%^%v5!gxum_2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", '.vercel.app', '.enova.id']
+ALLOWED_HOSTS = ["0.0.0.0", '157.230.194.189', '.enova.id']
 
 
 # Application definition
