@@ -41,7 +41,7 @@ def key_to_db_obj():
             'inventory': Inventory,
             'address': Address,
             'payment': Payment,
-            
+
             }
     return data
 
@@ -52,12 +52,15 @@ def view_data(request, token):
     obj = data[token].objects.select_related().all()
 
     field_names = [str(field.name) for field in data[token]._meta.get_fields()]
-
+    if token == 'staff':
+        field_names = field_names[1:]
     related_field_names = []
 
     for field in data[token]._meta.get_fields():
         if field.is_relation and field.name != 'id':
             related_field_names.append(field.name)
+
+    
     named_field_names = [convert_field_name(name) for name in field_names[1:]]
     combined_field_name = zip(field_names[1:], named_field_names)
     context = {
